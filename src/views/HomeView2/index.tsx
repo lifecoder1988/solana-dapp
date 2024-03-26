@@ -8,8 +8,18 @@ import styles from "./index.module.css";
 
 import { useEffect, useState } from "react";
 
+import { useProgram } from "./useProgram";
+
 import axios from "axios";
-import { set } from "@project-serum/anchor/dist/cjs/utils/features";
+
+import * as anchor from "@project-serum/anchor";
+
+import { useAnchorWallet } from "@solana/wallet-adapter-react";
+import { buyTicket } from "./ssq";
+
+const endpoint = "https://explorer-api.devnet.solana.com";
+
+const connection = new anchor.web3.Connection(endpoint);
 
 const apiHost = "http://127.0.0.1:8000/api/v1";
 
@@ -27,14 +37,17 @@ async function listTicketsByOwner(owner: string) {
 }
 
 function useGetTicketsByOwner(owner: string) {
+  console.log(111);
   const [data, setData] = useState(null);
-
+  let isMounted = true;
   useEffect(() => {
     const fetchData = async () => {
       try {
         // 数据获取逻辑
         const fetchedData = await listTicketsByOwner(owner);
-        setData(fetchedData);
+        if (isMounted) {
+          setData(fetchedData);
+        }
       } catch (error) {
         console.error("获取票据信息时出错：", error);
         // 根据你的需求处理错误，比如设置错误状态
@@ -42,6 +55,10 @@ function useGetTicketsByOwner(owner: string) {
     };
 
     fetchData();
+
+    return () => {
+      isMounted = false; // 组件卸载时更新标志
+    };
   }, [owner]); // 将owner作为依赖项
 
   return data;
@@ -58,10 +75,19 @@ export const HomeView2: FC = ({
   console.log(publicKey);
   let ownerData = null;
   if (publicKey != null) {
-    ownerData = useGetTicketsByOwner(publicKey.toBase58());
+    //ownerData = useGetTicketsByOwner(publicKey.toBase58());
   }
+
+  const wallet: any = useAnchorWallet();
+  const { program } = useProgram({ connection, wallet });
+
   //console.log(activeRoundData)
-  const onClick = () => {};
+  const onBuyTicket = async () => {
+    const ticketId = 12233;
+    const roundId = 1;
+    const ticketNum = 3;
+    await buyTicket({ wallet, program, ticketId, roundId, ticketNum });
+  };
 
   return (
     <div className="container mx-auto max-w-6xl p-8 2xl:px-0">
@@ -77,6 +103,21 @@ export const HomeView2: FC = ({
           </div>
           <div className="flex-none">
             <WalletMultiButton className="btn btn-ghost" />
+          </div>
+        </div>
+
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="card w-96 bg-base-100 shadow-xl">
+            <div className="card-body items-center text-center">
+              <h2 className="card-title">当前期号：{1}</h2>
+              <p>资金池：${222}</p>
+              <p>参与人数：{333}人</p>
+              <div className="card-actions justify-end">
+                <button className="btn btn-primary" onClick={onBuyTicket}>
+                  buy
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -184,6 +225,11 @@ export const HomeView2: FC = ({
                 </tr>
               </thead>
               <tbody>
+                {ownerData == null ? (
+                  <td colSpan={4} className="text-center text-gray-500">
+                    暂无数据
+                  </td>
+                ) : null}
                 {ownerData != null &&
                   ownerData.map((item: any) => (
                     <tr key={item.round_id + "- " + item.ticket_num}>

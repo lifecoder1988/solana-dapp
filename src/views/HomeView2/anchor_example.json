@@ -1,0 +1,418 @@
+{
+  "version": "0.1.0",
+  "name": "anchor_example",
+  "instructions": [
+    {
+      "name": "initialize",
+      "accounts": [
+        {
+          "name": "counterAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "data",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initializeRound",
+      "accounts": [
+        {
+          "name": "counterAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "roundAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "start",
+          "type": "i64"
+        },
+        {
+          "name": "end",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "claim",
+      "accounts": [
+        {
+          "name": "roundAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "winnerTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "calPrize",
+      "accounts": [
+        {
+          "name": "roundAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "p1",
+          "type": "u64"
+        },
+        {
+          "name": "p2",
+          "type": "u64"
+        },
+        {
+          "name": "p3",
+          "type": "u64"
+        },
+        {
+          "name": "p4",
+          "type": "u64"
+        },
+        {
+          "name": "p5",
+          "type": "u64"
+        },
+        {
+          "name": "p6",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "draw",
+      "accounts": [
+        {
+          "name": "roundAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "blockHash",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "buyTicket",
+      "accounts": [
+        {
+          "name": "ticket",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "buyer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "from",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "roundAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "ticketId",
+          "type": "u64"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Ticket",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "ticketId",
+            "type": "u64"
+          },
+          {
+            "name": "ticketNum",
+            "type": "u64"
+          },
+          {
+            "name": "roundId",
+            "type": "u64"
+          },
+          {
+            "name": "isUsed",
+            "type": "bool"
+          },
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "from",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CounterAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "data",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RoundAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "roundId",
+            "type": "u64"
+          },
+          {
+            "name": "selledTicket",
+            "type": "u64"
+          },
+          {
+            "name": "result",
+            "type": "u64"
+          },
+          {
+            "name": "start",
+            "type": "i64"
+          },
+          {
+            "name": "end",
+            "type": "i64"
+          },
+          {
+            "name": "total",
+            "type": "u64"
+          },
+          {
+            "name": "p1",
+            "type": "u64"
+          },
+          {
+            "name": "p2",
+            "type": "u64"
+          },
+          {
+            "name": "p3",
+            "type": "u64"
+          },
+          {
+            "name": "p4",
+            "type": "u64"
+          },
+          {
+            "name": "p5",
+            "type": "u64"
+          },
+          {
+            "name": "p6",
+            "type": "u64"
+          },
+          {
+            "name": "earn",
+            "type": "u64"
+          },
+          {
+            "name": "canTransfer",
+            "type": "u64"
+          },
+          {
+            "name": "isTransfered",
+            "type": "bool"
+          },
+          {
+            "name": "isFinished",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "IncorrectPayment",
+      "msg": "The provided payment is incorrect."
+    },
+    {
+      "code": 6001,
+      "name": "IncorrectRoundID",
+      "msg": "The provided round_id is incorrect."
+    },
+    {
+      "code": 6002,
+      "name": "ClaimFailed",
+      "msg": "The ticket is incorrect."
+    },
+    {
+      "code": 6003,
+      "name": "TicketIDError",
+      "msg": "The Ticket ID is incorrect."
+    },
+    {
+      "code": 6004,
+      "name": "PDAFailed",
+      "msg": "The PDA is incorrect."
+    },
+    {
+      "code": 6005,
+      "name": "Unauthorized",
+      "msg": "You are not admin..."
+    },
+    {
+      "code": 6006,
+      "name": "AlreadyDrawed",
+      "msg": "already drawed.."
+    },
+    {
+      "code": 6007,
+      "name": "TokenFailed",
+      "msg": "token not found"
+    },
+    {
+      "code": 6008,
+      "name": "OutofDate",
+      "msg": "out of date"
+    },
+    {
+      "code": 6009,
+      "name": "RoundError",
+      "msg": "round error"
+    },
+    {
+      "code": 6010,
+      "name": "NonePrize",
+      "msg": "no prize error"
+    }
+  ],
+  "metadata": {
+    "address": "7yR97qoBRRjo3nkyoBq7iFznYQq1Dba4us3R5Nu7a6GD"
+  }
+}

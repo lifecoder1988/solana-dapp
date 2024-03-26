@@ -1,75 +1,108 @@
 import * as anchor from "@project-serum/anchor";
 import bs58 from "bs58";
 
-import { Tweet, AccountData } from "./Tweet";
+import splToken from "@solana/spl-token";
 
-type GetTwitterProps = {
+import { PublicKey } from "@solana/web3.js";
+
+type BuyTicketProps = {
   program: anchor.Program<anchor.Idl>;
-  filter?: unknown[];
-};
-
-export const getTweets = async ({ program, filter = [] }: GetTwitterProps) => {
-  const tweetsRaw = await program.account.tweet.all(filter as any);
-  const tweets = tweetsRaw.map((t: any) => new Tweet(t.publicKey, t.account));
-  return tweets;
-};
-
-export const authorFilter = (authorBase58PublicKey: string) => ({
-  memcmp: {
-    offset: 8, // Discriminator.
-    bytes: authorBase58PublicKey,
-  },
-});
-
-export const topicFilter = (topic: string) => ({
-  memcmp: {
-    offset:
-      8 + // Discriminator.
-      32 + // Author public key.
-      8 + // Timestamp.
-      4, // Topic string prefix.
-    bytes: bs58.encode(Buffer.from(topic)),
-  },
-});
-
-type SendTweetProps = {
-  program: anchor.Program<anchor.Idl>;
-  topic: string;
-  content: string;
+  ticketId: number;
+  ticketNum: number;
+  roundId: number;
   wallet: any;
 };
 
-export const sendTweet = async ({
+async function getRoundPDA(
+  counter: anchor.BN,
+  program: anchor.Program<anchor.Idl>
+) {
+  const counterBuffer = counter.toArrayLike(Buffer);
+
+  let [roundPDA, _1] = await PublicKey.findProgramAddress(
+    [anchor.utils.bytes.utf8.encode("round"), counterBuffer],
+    program.programId
+  );
+  return roundPDA;
+}
+
+async function getPoolPDA(
+  counter: anchor.BN,
+  program: anchor.Program<anchor.Idl>
+) {
+  const counterBuffer = counter.toArrayLike(Buffer);
+
+  let [poolPDA, _1] = await PublicKey.findProgramAddress(
+    [anchor.utils.bytes.utf8.encode("pool"), counterBuffer],
+    program.programId
+  );
+  return poolPDA;
+}
+
+async function getTicketPDA(
+  roundID: anchor.BN,
+  ticketNum: anchor.BN,
+  program: anchor.Program<anchor.Idl>
+) {
+  const roundIDBuffer = roundID.toArrayLike(Buffer);
+  const ticketNumBuffer = ticketNum.toArrayLike(Buffer);
+
+  let [ticketPDA, _1] = await PublicKey.findProgramAddress(
+    [anchor.utils.bytes.utf8.encode("ticket"), roundIDBuffer, ticketNumBuffer],
+    program.programId
+  );
+  return ticketPDA;
+}
+
+async function getTokenAccount(walletPublicKey: PublicKey) {
+  const mintPublicKey = new PublicKey(
+    "6EiMyhhJDi33hgoGSZLoxZfRRTPLuhWKht4RPq2JVgXn"
+  );
+  console.log(splToken);
+
+  const associatedTokenAddress = await splToken.Token.getAssociatedTokenAddress(
+    splToken.ASSOCIATED_TOKEN_PROGRAM_ID, // 默认的关联Token程序ID
+    splToken.TOKEN_PROGRAM_ID, // 默认的Token程序ID
+    mintPublicKey, // Token的mint地址
+    walletPublicKey // 用户的钱包地址
+  );
+  return associatedTokenAddress;
+}
+export const buyTicket = async ({
   wallet,
   program,
-  topic,
-  content,
-}: SendTweetProps) => {
+  ticketId,
+  roundId,
+  ticketNum,
+}: BuyTicketProps) => {
   // Generate a new Keypair for our new tweet account.
-  const tweet = anchor.web3.Keypair.generate();
+  const roundPDA = await getRoundPDA(new anchor.BN(roundId), program);
+  const poolPDA = await getPoolPDA(new anchor.BN(roundId), program);
+  const ticketPDA = await getTicketPDA(
+    new anchor.BN(roundId),
+    new anchor.BN(ticketNum),
+    program
+  );
 
+  /*
+   const tx = await this.program.methods
+      .buyTicket(new anchor.BN(ticketID), new anchor.BN(amount))
+      .accounts({
+        ticket: ticketPDA,
+        roundAccount: roundPDA,
+        pool: poolPDA,
+        from: tokenAccount,
+      })
+      .rpc(); */
+  const tokenAccount = await getTokenAccount(wallet.publicKey);
   // Send a "SendTweet" instruction with the right data and the right accounts.
-  await program.rpc.sendTweet(topic, content, {
+  await program.rpc.buyTicket(new anchor.BN(ticketId), new anchor.BN(1000), {
     accounts: {
-      author: wallet.publicKey,
-      tweet: tweet.publicKey,
+      ticket: ticketPDA,
+      roundAccount: roundPDA,
+      pool: poolPDA,
+      from: tokenAccount,
       systemProgram: anchor.web3.SystemProgram.programId,
     },
-    signers: [tweet],
   });
-
-  // Fetch the newly created account from the blockchain may not work
-  // new account can be not found because it takes some time to confirm TX.
-  // const tweetAccount = await program.account.tweet.fetch(tweet.publicKey);
-
-  // instead we return object with same data
-  const newTweetAccount: AccountData = {
-    author: wallet.publicKey,
-    timestamp: new anchor.BN(new Date().getTime()),
-    topic,
-    content,
-  };
-
-  // Wrap the fetched account in a Tweet model so our frontend can display it.
-  return new Tweet(tweet.publicKey, newTweetAccount);
 };
