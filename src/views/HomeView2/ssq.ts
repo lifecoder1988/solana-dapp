@@ -1,7 +1,7 @@
 import * as anchor from "@project-serum/anchor";
 import bs58 from "bs58";
 
-import splToken from "@solana/spl-token";
+import * as splToken from "@solana/spl-token";
 
 import { PublicKey } from "@solana/web3.js";
 
@@ -58,7 +58,6 @@ async function getTokenAccount(walletPublicKey: PublicKey) {
   const mintPublicKey = new PublicKey(
     "6EiMyhhJDi33hgoGSZLoxZfRRTPLuhWKht4RPq2JVgXn"
   );
-  console.log(splToken);
 
   const associatedTokenAddress = await splToken.Token.getAssociatedTokenAddress(
     splToken.ASSOCIATED_TOKEN_PROGRAM_ID, // 默认的关联Token程序ID
@@ -102,7 +101,10 @@ export const buyTicket = async ({
       roundAccount: roundPDA,
       pool: poolPDA,
       from: tokenAccount,
+      buyer: wallet.publicKey,
+      tokenProgram: splToken.TOKEN_PROGRAM_ID,
       systemProgram: anchor.web3.SystemProgram.programId,
     },
+    signers: [wallet.payer],
   });
 };
