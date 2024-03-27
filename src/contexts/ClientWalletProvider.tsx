@@ -8,11 +8,11 @@ import {
   getSolflareWallet,
   getSolletWallet,
   // getSolongWallet,
-} from '@solana/wallet-adapter-wallets'
+} from "@solana/wallet-adapter-wallets";
 import { useMemo } from "react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 
-import('@solana/wallet-adapter-react-ui/styles.css' as any) ;
+import("@solana/wallet-adapter-react-ui/styles.css" as any);
 
 export function ClientWalletProvider(
   props: Omit<WalletProviderProps, "wallets">
@@ -37,12 +37,10 @@ export function ClientWalletProvider(
   );
 
   return (
-    <WalletProvider wallets={wallets} {...props}>
+    <WalletProvider wallets={wallets} {...props} autoConnect>
       <WalletModalProvider {...props} />
     </WalletProvider>
   );
-
-
 }
 
 export default ClientWalletProvider;

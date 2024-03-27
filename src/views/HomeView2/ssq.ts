@@ -3,7 +3,7 @@ import bs58 from "bs58";
 
 import * as splToken from "@solana/spl-token";
 
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, Transaction } from "@solana/web3.js";
 
 type BuyTicketProps = {
   program: anchor.Program<anchor.Idl>;
@@ -60,13 +60,50 @@ async function getTokenAccount(walletPublicKey: PublicKey) {
   );
 
   const associatedTokenAddress = await splToken.Token.getAssociatedTokenAddress(
-    splToken.ASSOCIATED_TOKEN_PROGRAM_ID, // 默认的关联Token程序ID
-    splToken.TOKEN_PROGRAM_ID, // 默认的Token程序ID
-    mintPublicKey, // Token的mint地址
-    walletPublicKey // 用户的钱包地址
+    splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+    splToken.TOKEN_PROGRAM_ID,
+    mintPublicKey,
+    walletPublicKey
   );
+  console.log(associatedTokenAddress.toBase58());
   return associatedTokenAddress;
 }
+
+async function buyTicketRpc(
+  wallet: any,
+  connection: anchor.web3.Connection,
+  instruction: anchor.web3.TransactionInstruction
+) {
+  // 获取与Phantom钱包关联的账户地址
+
+  try {
+    // 获取最近的区块哈希以设置交易的recentBlockhash
+    const { blockhash } = await connection.getRecentBlockhash();
+
+    // 构建交易
+    let transaction = new Transaction({
+      recentBlockhash: blockhash,
+      feePayer: wallet.publicKey,
+    });
+
+    // 将指令加入到交易
+    transaction.add(instruction);
+
+    // 让Phantom钱包签名交易
+    let signedTransaction = await wallet.signTransaction(transaction);
+
+    // 发送交易
+    const signature = await connection.sendRawTransaction(
+      signedTransaction.serialize()
+    );
+    await connection.confirmTransaction(signature);
+
+    console.log("Transaction confirmed with signature:", signature);
+  } catch (error) {
+    console.error("Failed to buy ticket:", error);
+  }
+}
+
 export const buyTicket = async ({
   wallet,
   program,
@@ -93,18 +130,27 @@ export const buyTicket = async ({
         from: tokenAccount,
       })
       .rpc(); */
+
   const tokenAccount = await getTokenAccount(wallet.publicKey);
   // Send a "SendTweet" instruction with the right data and the right accounts.
-  await program.rpc.buyTicket(new anchor.BN(ticketId), new anchor.BN(1000), {
-    accounts: {
-      ticket: ticketPDA,
-      roundAccount: roundPDA,
-      pool: poolPDA,
-      from: tokenAccount,
-      buyer: wallet.publicKey,
-      tokenProgram: splToken.TOKEN_PROGRAM_ID,
-      systemProgram: anchor.web3.SystemProgram.programId,
-    },
-    signers: [wallet.payer],
-  });
+
+  program.instruction.buyTicket;
+
+  const instruction = await program.instruction.buyTicket(
+    new anchor.BN(ticketId),
+    new anchor.BN(1000),
+    {
+      accounts: {
+        ticket: ticketPDA,
+        roundAccount: roundPDA,
+        pool: poolPDA,
+        from: tokenAccount,
+        buyer: wallet.publicKey,
+        tokenProgram: splToken.TOKEN_PROGRAM_ID,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      },
+    }
+  );
+
+  await buyTicketRpc(wallet, program.provider.connection, instruction);
 };

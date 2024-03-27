@@ -36,16 +36,16 @@ async function listTicketsByOwner(owner: string) {
   return null;
 }
 
-function useGetTicketsByOwner(owner: string) {
+function useGetTicketsByOwner(owner: string | null) {
   console.log(111);
   const [data, setData] = useState(null);
-  let isMounted = true;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         // 数据获取逻辑
-        const fetchedData = await listTicketsByOwner(owner);
-        if (isMounted) {
+        if (owner != null) {
+          const fetchedData = await listTicketsByOwner(owner);
           setData(fetchedData);
         }
       } catch (error) {
@@ -55,10 +55,6 @@ function useGetTicketsByOwner(owner: string) {
     };
 
     fetchData();
-
-    return () => {
-      isMounted = false; // 组件卸载时更新标志
-    };
   }, [owner]); // 将owner作为依赖项
 
   return data;
@@ -73,12 +69,13 @@ export const HomeView2: FC = ({
   const { publicKey } = useWallet();
 
   console.log(publicKey);
-  let ownerData = null;
-  if (publicKey != null) {
-    //ownerData = useGetTicketsByOwner(publicKey.toBase58());
-  }
+  const ownerData = useGetTicketsByOwner(
+    publicKey ? publicKey.toBase58() : null
+  );
 
   const wallet: any = useAnchorWallet();
+
+  console.log(wallet);
   const { program } = useProgram({ connection, wallet });
 
   //console.log(activeRoundData)
@@ -226,9 +223,11 @@ export const HomeView2: FC = ({
               </thead>
               <tbody>
                 {ownerData == null ? (
-                  <td colSpan={4} className="text-center text-gray-500">
-                    暂无数据
-                  </td>
+                  <tr>
+                    <td colSpan={4} className="text-center text-gray-500">
+                      暂无数据
+                    </td>
+                  </tr>
                 ) : null}
                 {ownerData != null &&
                   ownerData.map((item: any) => (
