@@ -10,7 +10,7 @@ export async function getServerSideProps(context: any) {
   console.log(111);
   const data = { message: "这是从服务器端获取的数据！" };
 
-  const apiHost = "http://127.0.0.1:8000/api/v1";
+  const apiHost = process.env.API_URL as string;
 
   const lotterySDK = new LotterySDK(apiHost);
   const activeRoundData = await lotterySDK.getActiveRound();

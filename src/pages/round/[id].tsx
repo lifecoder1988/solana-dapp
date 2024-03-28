@@ -18,7 +18,7 @@ export const getServerSideProps: GetServerSideProps<
 > = async ({ params }) => {
   console.log(params?.id);
   const id = params?.id;
-  const apiHost = "http://127.0.0.1:8000/api/v1";
+  const apiHost = process.env.API_URL as string;
 
   const roundId = id;
 

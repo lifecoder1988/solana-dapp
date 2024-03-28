@@ -21,10 +21,10 @@ const endpoint = "https://explorer-api.devnet.solana.com";
 
 const connection = new anchor.web3.Connection(endpoint);
 
-const apiHost = "http://127.0.0.1:8000/api/v1";
-
 async function listTicketsByOwner(owner: string) {
   try {
+    const apiHost = process.env.NEXT_PUBLIC_API_URL as string;
+
     const { data } = await axios.get(
       `${apiHost}/tickets/list_by_owner?owner=${owner}`
     );
