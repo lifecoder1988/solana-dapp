@@ -8,7 +8,7 @@ import { PublicKey, Transaction } from "@solana/web3.js";
 type BuyTicketProps = {
   program: anchor.Program<anchor.Idl>;
   ticketId: number;
-  ticketNum: number;
+
   roundId: number;
   wallet: any;
 };
@@ -104,19 +104,36 @@ async function buyTicketRpc(
   }
 }
 
+type FetchRoundProps = {
+  program: anchor.Program<anchor.Idl>;
+
+  roundId: number;
+};
+
+export const fetchRound = async ({
+  program,
+
+  roundId,
+}: FetchRoundProps) => {
+  const roundPDA = await getRoundPDA(new anchor.BN(roundId), program);
+  const roundResult = await program.account.roundAccount.fetch(roundPDA);
+  console.log(roundResult);
+  return roundResult;
+};
 export const buyTicket = async ({
   wallet,
   program,
   ticketId,
   roundId,
-  ticketNum,
 }: BuyTicketProps) => {
   // Generate a new Keypair for our new tweet account.
   const roundPDA = await getRoundPDA(new anchor.BN(roundId), program);
   const poolPDA = await getPoolPDA(new anchor.BN(roundId), program);
+
+  const roundAccount = await program.account.roundAccount.fetch(roundPDA);
   const ticketPDA = await getTicketPDA(
     new anchor.BN(roundId),
-    new anchor.BN(ticketNum),
+    new anchor.BN(roundAccount.ticketNum),
     program
   );
 

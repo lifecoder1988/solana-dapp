@@ -16,6 +16,7 @@ import * as anchor from "@project-serum/anchor";
 
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { buyTicket } from "./ssq";
+import LotteryInput from "components/LotteryInput";
 
 const endpoint = "https://explorer-api.devnet.solana.com";
 
@@ -67,15 +68,53 @@ interface HomeView2Props {
   currentTs: number;
 }
 
+const getRandomTicketArray = () => {
+  let arr = [];
+  for (let i = 0; i < 6; i++) {
+    const randomNumber = Math.floor(Math.random() * 32) + 1;
+    arr.push(randomNumber);
+  }
+  const randomNumber = Math.floor(Math.random() * 16) + 1;
+  arr.push(randomNumber);
+  return arr;
+};
+
+const ticketArrayToNumber = (arr: number[]) => {
+  let firstSix = arr.slice(0, 6);
+  let sortedFirstSix = firstSix.sort((a, b) => a - b);
+
+  console.log(arr);
+  console.log(sortedFirstSix);
+
+  let result = 0;
+
+  for (let i = 0; i < 6; i++) {
+    result = result * 32 + arr[i];
+    console.log(result);
+  }
+  result *= 16;
+
+  const lastElement = arr[arr.length - 1];
+  result += lastElement;
+  return result;
+};
+
 export const HomeView2: FC<HomeView2Props> = ({
   activeRoundData,
   olderRoundData,
   pendingRoundData,
   currentTs,
 }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [lotteryValues, setLotteryValues] = useState<number[]>(
+    getRandomTicketArray()
+  );
+
   const { publicKey } = useWallet();
 
   console.log(publicKey);
+
   const ownerData = useGetTicketsByOwner(
     publicKey ? publicKey.toBase58() : null
   );
@@ -86,18 +125,31 @@ export const HomeView2: FC<HomeView2Props> = ({
   const { program: myProgram } = useProgram({ connection, wallet });
 
   console.log(activeRoundData);
-  const onBuyTicket = async (ev: any) => {
-    const roundId = ev.target.getAttribute("data-round-id");
+
+  const pickTicket = async (ev: any) => {
+    setIsModalOpen(true);
+  };
+
+  const onBuyTicket = async (ticketArr: number[]) => {
+    const roundId = (activeRoundData && activeRoundData.roundId) || 1;
     console.log(roundId);
-
-    const ticketId = 12233;
-
-    const ticketNum = 3;
 
     const program: anchor.Program<anchor.Idl> =
       myProgram as anchor.Program<anchor.Idl>;
 
-    await buyTicket({ wallet, program, ticketId, roundId, ticketNum });
+    const ticketId = ticketArrayToNumber(ticketArr);
+    console.log(ticketId);
+
+    await buyTicket({ wallet, program, ticketId, roundId });
+    setIsModalOpen(false);
+  };
+
+  const onRandom = () => {
+    const arr = getRandomTicketArray();
+    setLotteryValues(arr);
+  };
+  const handleValuesChange = (values: number[]) => {
+    setLotteryValues(values);
   };
 
   return (
@@ -116,6 +168,38 @@ export const HomeView2: FC<HomeView2Props> = ({
             <WalletMultiButton className="btn btn-ghost" />
           </div>
         </div>
+
+        {isModalOpen && (
+          <div tabIndex={-1} className="modal modal-open">
+            <div className="modal-box">
+              <LotteryInput
+                values={lotteryValues}
+                setValues={setLotteryValues}
+              />
+              <div className="modal-action">
+                <button className="btn btn-primary" onClick={onRandom}>
+                  random
+                </button>
+
+                <button
+                  className="btn btn-primary"
+                  onClick={() => {
+                    onBuyTicket(lotteryValues);
+                  }}
+                >
+                  提交
+                </button>
+
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setIsModalOpen(false)}
+                >
+                  关闭
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {activeRoundData && (
           <div className="flex justify-center items-center min-h-screen">
@@ -143,7 +227,7 @@ export const HomeView2: FC<HomeView2Props> = ({
                   <button
                     className="btn btn-primary"
                     data-round-id={activeRoundData.round_id}
-                    onClick={onBuyTicket}
+                    onClick={pickTicket}
                   >
                     buy
                   </button>
