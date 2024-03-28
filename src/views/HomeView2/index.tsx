@@ -86,9 +86,12 @@ export const HomeView2: FC<HomeView2Props> = ({
   const { program: myProgram } = useProgram({ connection, wallet });
 
   console.log(activeRoundData);
-  const onBuyTicket = async () => {
+  const onBuyTicket = async (ev: any) => {
+    const roundId = ev.target.getAttribute("data-round-id");
+    console.log(roundId);
+
     const ticketId = 12233;
-    const roundId = 1;
+
     const ticketNum = 3;
 
     const program: anchor.Program<anchor.Idl> =
@@ -114,20 +117,41 @@ export const HomeView2: FC<HomeView2Props> = ({
           </div>
         </div>
 
-        <div className="flex justify-center items-center min-h-screen">
-          <div className="card w-96 bg-base-100 shadow-xl">
-            <div className="card-body items-center text-center">
-              <h2 className="card-title">当前期号：{1}</h2>
-              <p>资金池：${222}</p>
-              <p>参与人数：{333}人</p>
-              <div className="card-actions justify-end">
-                <button className="btn btn-primary" onClick={onBuyTicket}>
-                  buy
-                </button>
+        {activeRoundData && (
+          <div className="flex justify-center items-center min-h-screen">
+            <div className="card w-96 bg-base-100 shadow-xl">
+              <div className="card-body items-center text-center">
+                <h2 className="card-title">
+                  当前期号：{activeRoundData.round_id}
+                </h2>
+
+                <p>资金池：${222}</p>
+                <p>参与人数：{333}人</p>
+                <p>
+                  时间：{" "}
+                  <MyDate
+                    timestamp={activeRoundData.start * 1000}
+                    locale={"es"}
+                  ></MyDate>{" "}
+                  {" - "}{" "}
+                  <MyDate
+                    timestamp={activeRoundData.end * 1000}
+                    locale={"es"}
+                  ></MyDate>{" "}
+                </p>
+                <div className="card-actions justify-end">
+                  <button
+                    className="btn btn-primary"
+                    data-round-id={activeRoundData.round_id}
+                    onClick={onBuyTicket}
+                  >
+                    buy
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div className="text-center pt-2">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">已结束</h2>
