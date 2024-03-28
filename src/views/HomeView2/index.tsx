@@ -60,7 +60,14 @@ function useGetTicketsByOwner(owner: string | null) {
   return data;
 }
 
-export const HomeView2: FC = ({
+interface HomeView2Props {
+  activeRoundData: any; // 替换 any 为更具体的类型
+  olderRoundData: any;
+  pendingRoundData: any;
+  currentTs: number;
+}
+
+export const HomeView2: FC<HomeView2Props> = ({
   activeRoundData,
   olderRoundData,
   pendingRoundData,
@@ -76,13 +83,17 @@ export const HomeView2: FC = ({
   const wallet: any = useAnchorWallet();
 
   console.log(wallet);
-  const { program } = useProgram({ connection, wallet });
+  const { program: myProgram } = useProgram({ connection, wallet });
 
   //console.log(activeRoundData)
   const onBuyTicket = async () => {
     const ticketId = 12233;
     const roundId = 1;
     const ticketNum = 3;
+
+    const program: anchor.Program<anchor.Idl> =
+      myProgram as anchor.Program<anchor.Idl>;
+
     await buyTicket({ wallet, program, ticketId, roundId, ticketNum });
   };
 
@@ -230,7 +241,7 @@ export const HomeView2: FC = ({
                   </tr>
                 ) : null}
                 {ownerData != null &&
-                  ownerData.map((item: any) => (
+                  (ownerData as any[]).map((item: any) => (
                     <tr key={item.round_id + "- " + item.ticket_num}>
                       <td>{item.round_id}</td>
                       <td>{item.ticket_num}</td>

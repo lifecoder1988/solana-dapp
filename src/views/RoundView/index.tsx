@@ -8,7 +8,12 @@ import styles from "./index.module.css";
 
 import { useEffect, useState } from "react";
 
-export const RoundView: FC = ({ roundData, ticketsData }) => {
+interface RoundViewProps {
+  roundData: any; // 请根据实际数据结构替换any
+  ticketsData: any;
+}
+
+export const RoundView: FC<RoundViewProps> = ({ roundData, ticketsData }) => {
   const { publicKey } = useWallet();
 
   console.log(publicKey);

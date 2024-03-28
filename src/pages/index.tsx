@@ -24,7 +24,14 @@ export async function getServerSideProps(context: any) {
   };
 }
 
-const Home: NextPage = ({
+interface HomeProps {
+  activeRoundData: any; // 请根据实际数据结构替换any
+  olderRoundData: any;
+  pendingRoundData: any;
+  currentTs: number;
+}
+
+const Home: NextPage<HomeProps> = ({
   activeRoundData,
   olderRoundData,
   pendingRoundData,
