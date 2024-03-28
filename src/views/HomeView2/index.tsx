@@ -107,7 +107,7 @@ export const HomeView2: FC<HomeView2Props> = ({
             </button>
           </div>
           <div className="flex-1 px-2 mx-2">
-            <span className="text-lg font-bold">Caw Caw222</span>
+            <span className="text-lg font-bold">幸运8</span>
           </div>
           <div className="flex-none">
             <WalletMultiButton className="btn btn-ghost" />
@@ -130,21 +130,6 @@ export const HomeView2: FC<HomeView2Props> = ({
         </div>
 
         <div className="text-center pt-2">
-          <div className="hero min-h-16 py-4">
-            <div className="text-center hero-content">
-              <div className="max-w-lg">
-                <h1 className="mb-5 text-5xl font-bold">
-                  Hello Solana <SolanaLogo /> World!1
-                </h1>
-                <pre>{JSON.stringify(activeRoundData, null, 2)}</pre>
-                <pre>{JSON.stringify(olderRoundData, null, 2)}</pre>
-                <pre>{JSON.stringify(pendingRoundData, null, 2)}</pre>
-
-                <pre>{JSON.stringify(ownerData, null, 4)}</pre>
-              </div>
-            </div>
-          </div>
-
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">已结束</h2>
           <div className="overflow-x-auto">
             <table className="table w-full">
