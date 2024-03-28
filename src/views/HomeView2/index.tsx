@@ -85,7 +85,7 @@ export const HomeView2: FC<HomeView2Props> = ({
   console.log(wallet);
   const { program: myProgram } = useProgram({ connection, wallet });
 
-  //console.log(activeRoundData)
+  console.log(activeRoundData);
   const onBuyTicket = async () => {
     const ticketId = 12233;
     const roundId = 1;

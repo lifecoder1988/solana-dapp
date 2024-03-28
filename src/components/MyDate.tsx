@@ -9,7 +9,7 @@ type Props = {
 
 const formatDate = (timestamp: number, locale: "es" | "fr"): string => {
   const locales = { es, fr }; // 映射到date-fns的语言对象
-  return format(new Date(timestamp), "PPpp", { locale: locales[locale] });
+  return format(new Date(timestamp), "yyyy-MM-dd HH:mm:ss");
 };
 
 export const MyDate: FC<Props> = ({ timestamp, locale }) => {
