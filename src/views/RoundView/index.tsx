@@ -31,24 +31,10 @@ export const RoundView: FC<RoundViewProps> = ({ roundData, ticketsData }) => {
             </button>
           </div>
           <div className="flex-1 px-2 mx-2">
-            <span className="text-lg font-bold">Caw Caw222</span>
+            <span className="text-lg font-bold">幸运8</span>
           </div>
           <div className="flex-none">
             <WalletMultiButton className="btn btn-ghost" />
-          </div>
-        </div>
-
-        <div className="text-center pt-2">
-          <div className="hero min-h-16 py-4">
-            <div className="text-center hero-content">
-              <div className="max-w-lg">
-                <h1 className="mb-5 text-5xl font-bold">
-                  Hello Solana <SolanaLogo /> World!1
-                </h1>
-                <pre>{JSON.stringify(roundData, null, 2)}</pre>
-                <pre>{JSON.stringify(ticketsData, null, 2)}</pre>
-              </div>
-            </div>
           </div>
         </div>
 

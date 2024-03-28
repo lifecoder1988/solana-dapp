@@ -253,7 +253,13 @@ export const HomeView2: FC<HomeView2Props> = ({
               <tbody>
                 {olderRoundData.map((round: any) => (
                   <tr key={round.round_id}>
-                    <td>{round.round_id}</td>
+                    <td>
+                      <Link href={`/round/${round.round_id}`}>
+                        <a> {round.round_id}</a>
+                        {/* 使用a标签包裹内容，以使其可点击 */}
+                      </Link>
+                    </td>
+
                     <td>
                       <MyDate
                         timestamp={round.start * 1000}
