@@ -78,8 +78,9 @@ function useGetTokenBalance(owner: string | null, program: any) {
     const fetchData = async () => {
       try {
         // 数据获取逻辑
-        if (owner != null) {
+        if (owner != null && program != null) {
           const fetchedData = await fetchTokenBalance(owner, program);
+          console.log(fetchData);
           setData(fetchedData);
         }
       } catch (error) {

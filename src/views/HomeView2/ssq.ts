@@ -77,7 +77,7 @@ export const fetchTokenBalance = async (
     await program.provider.connection.getTokenAccountBalance(addr);
   console.log(tokenAccountBalance);
   return {
-    addr: addr,
+    addr: addr.toBase58(),
     balance: tokenAccountBalance.value.uiAmount,
   };
 };
