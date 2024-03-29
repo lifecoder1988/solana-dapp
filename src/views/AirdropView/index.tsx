@@ -16,17 +16,19 @@ async function doAirdrop(walletAddr: string) {
   return data["data"];
 }
 
-interface ToastData {
-  isShow: boolean;
-  msg: string;
-}
-
 export const AirdropView: FC = ({}) => {
   const { publicKey } = useWallet();
 
-  const [toastData, setToast] = useState<ToastData | null>(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const onClick = () => {};
+
+  const handleShowToast = (message: string) => {
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 5000); // 根据Toast组件的autoClose时间自动隐藏Toast
+  };
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
@@ -35,16 +37,10 @@ export const AirdropView: FC = ({}) => {
       console.log("Submitted wallet address:", walletAddress);
 
       await doAirdrop(walletAddress);
-      setToast({
-        isShow: true,
-        msg: "success",
-      });
+      handleShowToast("success");
     } catch (err) {
       console.log(err);
-      setToast({
-        isShow: true,
-        msg: "failed",
-      });
+      handleShowToast("failed");
     }
 
     // 在这里添加提交逻辑，例如调用API
@@ -67,10 +63,7 @@ export const AirdropView: FC = ({}) => {
           </div>
         </div>
 
-        <Toast
-          show={(toastData && toastData.isShow) as boolean}
-          message={toastData ? toastData.msg : ""}
-        />
+        <Toast show={showToast} message={toastMessage} />
 
         <div className="max-w-md mx-auto mt-10">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
