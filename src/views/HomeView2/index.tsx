@@ -15,8 +15,9 @@ import axios from "axios";
 import * as anchor from "@project-serum/anchor";
 
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
-import { buyTicket } from "./ssq";
+import { buyTicket, claim } from "./ssq";
 import LotteryInput from "components/LotteryInput";
+import { Ticket } from "components/Ticket";
 
 const endpoint = process.env.NEXT_PUBLIC_SOLANA_ENDPOINT as string;
 
@@ -147,6 +148,21 @@ export const HomeView2: FC<HomeView2Props> = ({
   const onRandom = () => {
     const arr = getRandomTicketArray();
     setLotteryValues(arr);
+  };
+
+  const onClaim = async (item: any) => {
+    console.log(
+      `[onClaim] roundId = ${item.round_id} , ticketId = ${item.ticket_id} ticketNum = ${item.ticket_num}`
+    );
+    const program: anchor.Program<anchor.Idl> =
+      myProgram as anchor.Program<anchor.Idl>;
+    await claim({
+      wallet,
+      program,
+      ticketId: item.ticket_id,
+      roundId: item.round_id,
+      ticketNum: item.ticket_num,
+    });
   };
   const handleValuesChange = (values: number[]) => {
     setLotteryValues(values);
@@ -328,7 +344,7 @@ export const HomeView2: FC<HomeView2Props> = ({
                   <th>期号</th>
                   <th>序号</th>
                   <th>票号</th>
-                  <th>状态</th>
+                  <th>操作</th>
                 </tr>
               </thead>
               <tbody>
@@ -344,11 +360,19 @@ export const HomeView2: FC<HomeView2Props> = ({
                     <tr key={item.round_id + "- " + item.ticket_num}>
                       <td>{item.round_id}</td>
                       <td>{item.ticket_num}</td>
-                      <td>{item.ticket_id}</td>
+                      <td>
+                        <Ticket ticketId={item.ticket_id} />
+                      </td>
 
                       <td>
-                        {item.is_used === 0 ? <span>未使用</span> : null}
-                        {item.is_used === 1 ? <span>已刮奖</span> : null}
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => {
+                            onClaim(item);
+                          }}
+                        >
+                          兑奖
+                        </button>
                       </td>
                     </tr>
                   ))}

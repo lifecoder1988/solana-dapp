@@ -82,7 +82,7 @@ async function getTokenAccount(walletPublicKey: PublicKey) {
   return associatedTokenAddress;
 }
 
-async function buyTicketRpc(
+async function chainRpc(
   wallet: any,
   connection: anchor.web3.Connection,
   instruction: anchor.web3.TransactionInstruction
@@ -133,6 +133,51 @@ export const fetchRound = async ({
   console.log(roundResult);
   return roundResult;
 };
+
+type ClaimProps = {
+  program: anchor.Program<anchor.Idl>;
+  ticketId: number;
+
+  roundId: number;
+  wallet: any;
+  ticketNum: number;
+};
+
+export const claim = async ({
+  wallet,
+  program,
+  ticketId,
+  roundId,
+  ticketNum,
+}: ClaimProps) => {
+  const roundPDA = await getRoundPDA(new anchor.BN(roundId), program);
+  const poolPDA = await getPoolPDA(new anchor.BN(roundId), program);
+
+  const ticketPDA = await getTicketPDA(
+    new anchor.BN(roundId),
+    new anchor.BN(ticketNum),
+    program
+  );
+
+  console.log(
+    `poolPDA = ${poolPDA} roundPDA = ${roundPDA} ticketPDA = ${ticketPDA}`
+  );
+
+  const tokenAccount = await getTokenAccount(wallet.publicKey);
+
+  const instruction = await program.instruction.claim({
+    accounts: {
+      ticketAccount: ticketPDA,
+      roundAccount: roundPDA,
+      pool: poolPDA,
+      winnerTokenAccount: tokenAccount,
+
+      tokenProgram: splToken.TOKEN_PROGRAM_ID,
+      systemProgram: anchor.web3.SystemProgram.programId,
+    },
+  });
+  await chainRpc(wallet, program.provider.connection, instruction);
+};
 export const buyTicket = async ({
   wallet,
   program,
@@ -165,8 +210,6 @@ export const buyTicket = async ({
   const tokenAccount = await getTokenAccount(wallet.publicKey);
   // Send a "SendTweet" instruction with the right data and the right accounts.
 
-  program.instruction.buyTicket;
-
   const instruction = await program.instruction.buyTicket(
     new anchor.BN(ticketId),
     new anchor.BN(1000),
@@ -183,5 +226,5 @@ export const buyTicket = async ({
     }
   );
 
-  await buyTicketRpc(wallet, program.provider.connection, instruction);
+  await chainRpc(wallet, program.provider.connection, instruction);
 };
