@@ -131,7 +131,7 @@ export const HomeView2: FC<HomeView2Props> = ({
   };
 
   const onBuyTicket = async (ticketArr: number[]) => {
-    const roundId = (activeRoundData && activeRoundData.roundId) || 1;
+    const roundId = (activeRoundData && activeRoundData.round_id) || 1;
     console.log(roundId);
 
     const program: anchor.Program<anchor.Idl> =
