@@ -43,7 +43,7 @@ async function getPoolPDA(
   counter: anchor.BN,
   program: anchor.Program<anchor.Idl>
 ) {
-  const counterBuffer = counter.toArrayLike(Buffer);
+  const counterBuffer = counter.toArrayLike(Buffer, "le", 8);
 
   let [poolPDA, _1] = await PublicKey.findProgramAddress(
     [anchor.utils.bytes.utf8.encode("pool"), counterBuffer],
@@ -57,8 +57,8 @@ async function getTicketPDA(
   ticketNum: anchor.BN,
   program: anchor.Program<anchor.Idl>
 ) {
-  const roundIDBuffer = roundID.toArrayLike(Buffer);
-  const ticketNumBuffer = ticketNum.toArrayLike(Buffer);
+  const roundIDBuffer = roundID.toArrayLike(Buffer, "le", 8);
+  const ticketNumBuffer = ticketNum.toArrayLike(Buffer, "le", 8);
 
   let [ticketPDA, _1] = await PublicKey.findProgramAddress(
     [anchor.utils.bytes.utf8.encode("ticket"), roundIDBuffer, ticketNumBuffer],
@@ -69,7 +69,7 @@ async function getTicketPDA(
 
 async function getTokenAccount(walletPublicKey: PublicKey) {
   const mintPublicKey = new PublicKey(
-    "6EiMyhhJDi33hgoGSZLoxZfRRTPLuhWKht4RPq2JVgXn"
+    process.env.NEXT_PUBLIC_MINT_ACCOUNT as string
   );
 
   const associatedTokenAddress = await splToken.Token.getAssociatedTokenAddress(

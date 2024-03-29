@@ -18,7 +18,7 @@ import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { buyTicket } from "./ssq";
 import LotteryInput from "components/LotteryInput";
 
-const endpoint = "https://explorer-api.devnet.solana.com";
+const endpoint = process.env.NEXT_PUBLIC_SOLANA_ENDPOINT as string;
 
 const connection = new anchor.web3.Connection(endpoint);
 
