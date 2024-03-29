@@ -250,7 +250,7 @@ export const HomeView2: FC<HomeView2Props> = ({
           <a className="text-4xl font-bold hover:underline">want airdrop ?</a>
         </Link>
         {isModalOpen && (
-          <div tabIndex={-1} className="modal modal-open">
+          <div tabIndex={-1} className="modal modal-open z-40">
             <div className="modal-box">
               <LotteryInput
                 values={lotteryValues}
