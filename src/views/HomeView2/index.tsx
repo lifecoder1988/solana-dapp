@@ -245,6 +245,10 @@ export const HomeView2: FC<HomeView2Props> = ({
         <p>MINT_TOKEN : {process.env.NEXT_PUBLIC_MINT_ACCOUNT}</p>
         <p>Token Addr : {tokenBalance?.addr}</p>
         <p>Token Balance : {tokenBalance?.balance}</p>
+
+        <Link href="/airdrop">
+          <a className="text-4xl font-bold hover:underline">want airdrop ?</a>
+        </Link>
         {isModalOpen && (
           <div tabIndex={-1} className="modal modal-open">
             <div className="modal-box">
