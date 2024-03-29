@@ -143,6 +143,7 @@ export const buyTicket = async ({
   const roundPDA = await getRoundPDA(new anchor.BN(roundId), program);
   const poolPDA = await getPoolPDA(new anchor.BN(roundId), program);
 
+  console.log(`poolPDA = ${poolPDA} roundPDA = ${roundPDA}`);
   const roundAccount = await program.account.roundAccount.fetch(roundPDA);
   const ticketPDA = await getTicketPDA(
     new anchor.BN(roundId),
