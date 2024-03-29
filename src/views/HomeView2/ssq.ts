@@ -171,7 +171,7 @@ export const claim = async ({
       roundAccount: roundPDA,
       pool: poolPDA,
       winnerTokenAccount: tokenAccount,
-
+      signer: wallet.publicKey,
       tokenProgram: splToken.TOKEN_PROGRAM_ID,
       systemProgram: anchor.web3.SystemProgram.programId,
     },
