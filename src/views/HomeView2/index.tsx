@@ -89,7 +89,7 @@ const ticketArrayToNumber = (arr: number[]) => {
   let result = 0;
 
   for (let i = 0; i < 6; i++) {
-    result = result * 32 + arr[i] - 1;
+    result = result * 32 + sortedFirstSix[i] - 1;
     console.log(result);
   }
   result *= 16;
