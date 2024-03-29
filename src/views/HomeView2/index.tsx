@@ -65,7 +65,7 @@ function useGetTicketsByOwner(owner: string | null) {
 }
 
 interface WalletData {
-  addr: anchor.web3.PublicKey;
+  addr: string;
   balance: number | null;
 }
 
@@ -79,7 +79,10 @@ function useGetTokenBalance(owner: string | null, program: any) {
       try {
         // 数据获取逻辑
         if (owner != null && program != null) {
-          const fetchedData = await fetchTokenBalance(owner, program);
+          const fetchedData: WalletData = await fetchTokenBalance(
+            owner,
+            program
+          );
           console.log(fetchData);
           setData(fetchedData);
         }
