@@ -147,7 +147,7 @@ export const buyTicket = async ({
   const roundAccount = await program.account.roundAccount.fetch(roundPDA);
   const ticketPDA = await getTicketPDA(
     new anchor.BN(roundId),
-    new anchor.BN(roundAccount.ticketNum),
+    new anchor.BN(roundAccount.selledTicket),
     program
   );
 
