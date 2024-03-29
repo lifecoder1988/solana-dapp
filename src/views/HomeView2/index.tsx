@@ -19,6 +19,8 @@ import { buyTicket, claim } from "./ssq";
 import LotteryInput from "components/LotteryInput";
 import { Ticket } from "components/Ticket";
 
+import { useLoading } from "../../contexts/LoadingContext";
+
 const endpoint = process.env.NEXT_PUBLIC_SOLANA_ENDPOINT as string;
 
 const connection = new anchor.web3.Connection(endpoint);
@@ -112,6 +114,8 @@ export const HomeView2: FC<HomeView2Props> = ({
     getRandomTicketArray()
   );
 
+  const { setIsLoading } = useLoading();
+
   const { publicKey } = useWallet();
 
   console.log(publicKey);
@@ -132,17 +136,24 @@ export const HomeView2: FC<HomeView2Props> = ({
   };
 
   const onBuyTicket = async (ticketArr: number[]) => {
-    const roundId = (activeRoundData && activeRoundData.round_id) || 1;
-    console.log(roundId);
+    try {
+      setIsLoading(true);
+      const roundId = (activeRoundData && activeRoundData.round_id) || 1;
+      console.log(roundId);
 
-    const program: anchor.Program<anchor.Idl> =
-      myProgram as anchor.Program<anchor.Idl>;
+      const program: anchor.Program<anchor.Idl> =
+        myProgram as anchor.Program<anchor.Idl>;
 
-    const ticketId = ticketArrayToNumber(ticketArr);
-    console.log(ticketId);
+      const ticketId = ticketArrayToNumber(ticketArr);
+      console.log(ticketId);
 
-    await buyTicket({ wallet, program, ticketId, roundId });
-    setIsModalOpen(false);
+      await buyTicket({ wallet, program, ticketId, roundId });
+      setIsModalOpen(false);
+      setIsLoading(false);
+    } catch (err) {
+      console.log(err);
+      setIsLoading(false);
+    }
   };
 
   const onRandom = () => {
@@ -151,18 +162,25 @@ export const HomeView2: FC<HomeView2Props> = ({
   };
 
   const onClaim = async (item: any) => {
-    console.log(
-      `[onClaim] roundId = ${item.round_id} , ticketId = ${item.ticket_id} ticketNum = ${item.ticket_num}`
-    );
-    const program: anchor.Program<anchor.Idl> =
-      myProgram as anchor.Program<anchor.Idl>;
-    await claim({
-      wallet,
-      program,
-      ticketId: item.ticket_id,
-      roundId: item.round_id,
-      ticketNum: item.ticket_num,
-    });
+    try {
+      setIsLoading(true);
+      console.log(
+        `[onClaim] roundId = ${item.round_id} , ticketId = ${item.ticket_id} ticketNum = ${item.ticket_num}`
+      );
+      const program: anchor.Program<anchor.Idl> =
+        myProgram as anchor.Program<anchor.Idl>;
+      await claim({
+        wallet,
+        program,
+        ticketId: item.ticket_id,
+        roundId: item.round_id,
+        ticketNum: item.ticket_num,
+      });
+      setIsLoading(false);
+    } catch (err) {
+      console.log(err);
+      setIsLoading(false);
+    }
   };
   const handleValuesChange = (values: number[]) => {
     setLotteryValues(values);

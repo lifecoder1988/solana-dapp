@@ -7,6 +7,10 @@ import "tailwindcss/tailwind.css";
 import "../styles/globals.css";
 import "../styles/App.css";
 
+import { LoadingProvider } from "../contexts/LoadingContext";
+
+import { GlobalLoadingIndicator } from "../components/GlobalLoadingIndicator";
+
 // set custom RPC server endpoint for the final website
 const endpoint = "https://explorer-api.devnet.solana.com";
 // const endpoint = "http://127.0.0.1:8899";
@@ -23,7 +27,10 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider>
-        <Component {...pageProps} />
+        <LoadingProvider>
+          <GlobalLoadingIndicator />
+          <Component {...pageProps} />
+        </LoadingProvider>
       </WalletProvider>
     </ConnectionProvider>
   );
