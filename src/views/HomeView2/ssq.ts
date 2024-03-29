@@ -46,7 +46,7 @@ async function getPoolPDA(
   const counterBuffer = counter.toArrayLike(Buffer, "le", 8);
 
   let [poolPDA, _1] = await PublicKey.findProgramAddress(
-    [anchor.utils.bytes.utf8.encode("pool"), counterBuffer],
+    [anchor.utils.bytes.utf8.encode("round-pool"), counterBuffer],
     program.programId
   );
   return poolPDA;
