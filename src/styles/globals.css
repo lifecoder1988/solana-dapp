@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.spinner-border {
+    border-color: transparent;
+    border-top-color: currentColor; /* 使用currentColor，这样颜色就会继承文字颜色 */
+    border-right-color: currentColor; /* 使得加载指示器的一半显示为指定的颜色 */
+  }
+  
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+  

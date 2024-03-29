@@ -15,7 +15,7 @@ import axios from "axios";
 import * as anchor from "@project-serum/anchor";
 
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
-import { buyTicket, claim } from "./ssq";
+import { buyTicket, claim, fetchTokenBalance } from "./ssq";
 import LotteryInput from "components/LotteryInput";
 import { Ticket } from "components/Ticket";
 
@@ -60,6 +60,36 @@ function useGetTicketsByOwner(owner: string | null) {
 
     fetchData();
   }, [owner]); // 将owner作为依赖项
+
+  return data;
+}
+
+interface WalletData {
+  addr: anchor.web3.PublicKey;
+  balance: number | null;
+}
+
+function useGetTokenBalance(owner: string | null, program: any) {
+  //fetchTokenBalance
+
+  const [data, setData] = useState<WalletData | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // 数据获取逻辑
+        if (owner != null) {
+          const fetchedData = await fetchTokenBalance(owner, program);
+          setData(fetchedData);
+        }
+      } catch (error) {
+        console.error("获取票据信息时出错：", error);
+        // 根据你的需求处理错误，比如设置错误状态
+      }
+    };
+
+    fetchData();
+  }, [owner, program]); // 将owner作为依赖项
 
   return data;
 }
@@ -131,6 +161,10 @@ export const HomeView2: FC<HomeView2Props> = ({
 
   console.log(activeRoundData);
 
+  const tokenBalance = useGetTokenBalance(
+    publicKey ? publicKey.toBase58() : null,
+    myProgram
+  );
   const pickTicket = async (ev: any) => {
     setIsModalOpen(true);
   };
@@ -202,7 +236,11 @@ export const HomeView2: FC<HomeView2Props> = ({
             <WalletMultiButton className="btn btn-ghost" />
           </div>
         </div>
-
+        <p>solana网络 : {process.env.NEXT_PUBLIC_SOLANA_ENDPOINT}</p>
+        <p>CA : {myProgram?.programId.toBase58()}</p>
+        <p>MINT_TOKEN : {process.env.NEXT_PUBLIC_MINT_ACCOUNT}</p>
+        <p>Token Addr : {tokenBalance?.addr}</p>
+        <p>Token Balance : {tokenBalance?.balance}</p>
         {isModalOpen && (
           <div tabIndex={-1} className="modal modal-open">
             <div className="modal-box">

@@ -67,6 +67,21 @@ async function getTicketPDA(
   return ticketPDA;
 }
 
+export const fetchTokenBalance = async (
+  walletAddr: string,
+  program: anchor.Program<anchor.Idl>
+) => {
+  const walletPublicKey = new PublicKey(walletAddr);
+  const addr = await getTokenAccount(walletPublicKey);
+  const tokenAccountBalance =
+    await program.provider.connection.getTokenAccountBalance(addr);
+  console.log(tokenAccountBalance);
+  return {
+    addr: addr,
+    balance: tokenAccountBalance.value.uiAmount,
+  };
+};
+
 async function getTokenAccount(walletPublicKey: PublicKey) {
   const mintPublicKey = new PublicKey(
     process.env.NEXT_PUBLIC_MINT_ACCOUNT as string
