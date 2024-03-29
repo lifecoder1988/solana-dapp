@@ -4,7 +4,8 @@ import * as anchor from "@project-serum/anchor";
 
 import idl from "./anchor_example.json";
 
-const SOLANA_SSQ_PROGRAM = "6SNqCZQSHmRQC3Ki2aq2w5xwJ4fFKv4wxSaZXGdXUQSU";
+const SOLANA_SSQ_PROGRAM = idl.metadata.address;
+//const SOLANA_SSQ_PROGRAM = "6SNqCZQSHmRQC3Ki2aq2w5xwJ4fFKv4wxSaZXGdXUQSU";
 const programID = new PublicKey(SOLANA_SSQ_PROGRAM);
 
 export interface Wallet {

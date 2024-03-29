@@ -17,6 +17,19 @@ async function getRoundPDA(
   counter: anchor.BN,
   program: anchor.Program<anchor.Idl>
 ) {
+  const counterBuffer = counter.toArrayLike(Buffer, "le", 8);
+  let [roundPDA, _1] = await PublicKey.findProgramAddress(
+    [anchor.utils.bytes.utf8.encode("round"), counterBuffer],
+    program.programId
+  );
+
+  return roundPDA;
+}
+
+/*async function getRoundPDA(
+  counter: anchor.BN,
+  program: anchor.Program<anchor.Idl>
+) {
   const counterBuffer = counter.toArrayLike(Buffer);
 
   let [roundPDA, _1] = await PublicKey.findProgramAddress(
@@ -24,7 +37,7 @@ async function getRoundPDA(
     program.programId
   );
   return roundPDA;
-}
+}*/
 
 async function getPoolPDA(
   counter: anchor.BN,
